@@ -1,7 +1,7 @@
 import '/custom_code/actions/index.dart' as actions;
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
-
+import 'package:flutter_telegram_web_app/flutter_telegram_web_app.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
 import '/backend/supabase/supabase.dart';
