@@ -29,7 +29,6 @@ void main() async {
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   State<MyApp> createState() => _MyAppState();
 
@@ -40,6 +39,10 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   ThemeMode _themeMode = ThemeMode.system;
 
+  // Use ValueNotifier for theme mode
+  final ValueNotifier<ThemeMode> _notifier =
+  ValueNotifier(ThemeMode.system);
+
   late AppStateNotifier _appStateNotifier;
   late GoRouter _router;
 
@@ -49,28 +52,45 @@ class _MyAppState extends State<MyApp> {
 
     _appStateNotifier = AppStateNotifier.instance;
     _router = createRouter(_appStateNotifier);
+
+    // Listen to the theme changes
+    _notifier.addListener(() {
+      setThemeMode(_notifier.value);
+    });
   }
 
-  void setThemeMode(ThemeMode mode) => setState(() {
-        _themeMode = mode;
-      });
+  void setThemeMode(ThemeMode mode) {
+    setState(() {
+      _themeMode = mode;
+      _notifier.value = mode; // Update notifier value
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      title: 'donApp',
-      localizationsDelegates: const [
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en', '')],
-      theme: ThemeData(
-        brightness: Brightness.light,
-        useMaterial3: false,
-      ),
-      themeMode: _themeMode,
-      routerConfig: _router,
+    return ValueListenableBuilder<ThemeMode>(
+      valueListenable: _notifier,
+      builder: (_, mode, __) {
+        return MaterialApp.router(
+          title: 'donApp',
+          localizationsDelegates: const [
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('en', '')],
+          theme: ThemeData(
+            brightness: Brightness.light,
+            useMaterial3: false,
+          ),
+          darkTheme: ThemeData(
+            brightness: Brightness.dark,
+            useMaterial3: false,
+          ),
+          themeMode: mode,
+          routerConfig: _router,
+        );
+      },
     );
   }
 }
